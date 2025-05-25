@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Brain Tumor Classification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f9f9f9;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+        }
+        select, input[type="file"], button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4a7023;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background-color 0.3s ease;
+        }
+        button:hover:not(:disabled) {
+            background-color: #365218;
+        }
+        button:disabled {
+            background-color: #9bbf7f;
+            cursor: not-allowed;
+        }
+        #imagePreview {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        #imagePreview img {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        #downloadBtn {
+            display: none;
+            margin-bottom: 15px;
+        }
+        .result-container {
+            margin-top: 20px;
+        }
+        #predictionResult {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        #confidence {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Brain Tumor Image Classification</h1>
+
+    <label for="model_type">Select Model:</label>
+    <select id="model_type" name="model_type">
+        <option value="pytorch">PyTorch Model</option>
+        <option value="tensorflow">TensorFlow Model</option>
+    </select>
+
+    <label for="fileInput">Upload an MRI image:</label>
+    <input type="file" id="fileInput" accept="image/*" />
+
+    <div id="imagePreview"></div>
+
+    <button id="downloadBtn">Download image</button>
+
+    <button id="predictBtn" disabled>Predict</button>
+
+    <div class="result-container">
+        <div id="predictionResult">Please upload an MRI image.</div>
+        <div id="confidence">Probability: -</div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const predictBtn = document.getElementById('predictBtn');
+        const predictionResult = document.getElementById('predictionResult');
+        const confidence = document.getElementById('confidence');
+
+        let currentImageDataUrl = '';
+
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (!file || !file.type.startsWith('image/')) {
+                imagePreview.innerHTML = '';
+                downloadBtn.style.display = 'none';
+                predictBtn.disabled = true;
+                predictionResult.textContent = 'Please upload a valid MRI image.';
+                confidence.textContent = 'Probability: -';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentImageDataUrl = e.target.result;
+                imagePreview.innerHTML = `<img src="${currentImageDataUrl}" alt="Preview" />`;
+                downloadBtn.style.display = 'inline-block';
+                predictBtn.disabled = false;
+                predictionResult.textContent = 'Image ready for analysis.';
+                confidence.textContent = 'Probability: -';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            if (!currentImageDataUrl) return;
+
+            const link = document.createElement('a');
+            link.href = currentImageDataUrl;
+            link.download = 'uploaded_mri_image.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        predictBtn.addEventListener('click', async () => {
+            if (!fileInput.files.length) return;
+
+            predictBtn.disabled = true;
+            predictionResult.textContent = 'Analysis in progress...';
+            confidence.textContent = 'Probability: -';
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('model_type', document.getElementById('model_type').value);
+
+            try {
+                const response = await fetch('/', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.error) {
+                    predictionResult.textContent = 'Error : ' + data.error;
+                    confidence.textContent = 'Probability: -';
+                } else {
+                    predictionResult.textContent = 'Prediction : ' + data.prediction;
+                    confidence.textContent = 'Probability : ' + data.confidence + '%';
+                }
+            } catch (err) {
+                predictionResult.textContent = 'Error : ' + err.message;
+                confidence.textContent = 'Probability: -';
+            } finally {
+                predictBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

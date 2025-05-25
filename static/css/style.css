@@ -1,0 +1,88 @@
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', sans-serif;
+        background: #e6f3fb;
+        color: #2d3e50;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 50px auto;
+        background: #ffffff;
+        padding: 30px 25px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        text-align: center;
+        color: #2374ab;
+        margin-bottom: 30px;
+    }
+
+    label {
+        font-weight: bold;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    select,
+    input[type="file"],
+    button {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 18px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e0;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+    button {
+        background-color: #2374ab;
+        color: white;
+        font-weight: bold;
+        border: none;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover:not(:disabled) {
+        background-color: #185e87;
+    }
+
+    button:disabled {
+        background-color: #a6cde4;
+        cursor: not-allowed;
+    }
+
+    #imagePreview {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    #imagePreview img {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    #downloadBtn {
+        display: none;
+    }
+
+    .result-container {
+        margin-top: 20px;
+        background-color: #f0f8ff;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #2374ab;
+    }
+
+    #predictionResult,
+    #confidence {
+        font-size: 18px;
+        margin: 6px 0;
+    }
